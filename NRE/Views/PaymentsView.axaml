@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:paymentMethods="clr-namespace:NRE.Models.Entities.PaymentMethods"
+             x:CompileBindings="False"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="NRE.Views.PaymentsView">
+    <Grid RowDefinitions="*,Auto">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Column 0: transaction form -->
+        <StackPanel x:Name="SpGeneralForm" Grid.Row="0" Grid.Column="0" Spacing="8" HorizontalAlignment="Left">
+            <StackPanel>
+                <Label Content="Seller:"/>
+                <ComboBox x:Name="CmbSeller" SelectedItem="{Binding Seller}" DisplayMemberBinding="{Binding Name}"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Buyer:"/>
+                <ComboBox x:Name="CmbBuyer" SelectedItem="{Binding Buyer}" DisplayMemberBinding="{Binding Name}"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Estate:"/>
+                <ComboBox x:Name="CmbEstates"
+                          SelectedItem="{Binding Estate}"
+                          DisplayMemberBinding="{Binding ShortDescription}"
+                          SelectionChanged="CmbEstates_OnSelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Payment Method:"/>
+                <ComboBox x:Name="CmbPaymentMethods"
+                          DisplayMemberBinding="{Binding DisplayName}"
+                          SelectionChanged="CmbPaymentMethods_OnSelectionChanged"/>
+            </StackPanel>
+
+            <!-- Fields shared by all payment methods -->
+            <StackPanel x:Name="SpPaymentCommon" Spacing="8">
+                <StackPanel>
+                    <Label Content="Amount:"/>
+                    <TextBox x:Name="TxtAmount" Text="{Binding Amount}"/>
+                </StackPanel>
+                <StackPanel>
+                    <Label Content="Payment Date:"/>
+                    <CalendarDatePicker x:Name="DpPaymentDate" Width="350" SelectedDate="{Binding Date}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Payment method fields: the template is picked from the type of the content -->
+            <StackPanel Spacing="8">
+                <ContentControl x:Name="DynamicForm">
+                    <ContentControl.DataTemplates>
+                        <!-- Bank Transfer -->
+                        <DataTemplate DataType="paymentMethods:BankTransfer">
+                            <StackPanel>
+                                <Label Content="Bank Name:"/>
+                                <TextBox x:Name="TxtBankName" Text="{Binding BankName}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                        <!-- Paypal -->
+                        <DataTemplate DataType="paymentMethods:Paypal">
+                            <StackPanel>
+                                <Label Content="Email:"/>
+                                <TextBox x:Name="TxtEmail" Text="{Binding Email}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                        <!-- Western Union -->
+                        <DataTemplate DataType="paymentMethods:WesternUnion">
+                            <StackPanel>
+                                <Label Content="Receiver Name:"/>
+                                <TextBox x:Name="TxtReceiverName" Text="{Binding ReceiverName}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </StackPanel>
+        </StackPanel>
+
+        <ListBox x:Name="LbTransactions"
+                 Grid.Row="0" Grid.Column="4"
+                 Classes="items"
+                 SelectionChanged="LbTransactions_OnSelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Shown while an item is selected -->
+        <StackPanel x:Name="SpEditButtons"
+                    Grid.Row="1" Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    IsVisible="False">
+            <Button x:Name="BtnEdit" Classes="action" Content="Edit" Click="BtnEdit_OnClick"/>
+            <Button x:Name="BtnRemove" Classes="action" Content="Remove" Click="BtnRemove_OnClick"/>
+        </StackPanel>
+
+        <!-- Shown while nothing is selected -->
+        <Button x:Name="BtnAdd"
+                Grid.Row="1" Grid.Column="0"
+                Classes="action"
+                Content="Add"
+                Click="BtnAdd_OnClick"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,287 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:estates="clr-namespace:NRE.Models.Entities.Estates"
+             xmlns:estateCategories="clr-namespace:NRE.Models.Abstracts.EstateCategories"
+             x:CompileBindings="False"
+             mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="910"
+             x:Class="NRE.Views.EstatesView">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+
+        <!-- Column 0: fields shared by all estates -->
+        <StackPanel x:Name="SpGeneralForm" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Spacing="8" HorizontalAlignment="Left">
+            <StackPanel>
+                <Label Content="Select Estate Type:"/>
+                <ComboBox x:Name="CmbEstateType"
+                          DisplayMemberBinding="{Binding DisplayName}"
+                          SelectionChanged="CmbEstateType_OnSelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Seller:"/>
+                <ComboBox x:Name="CmbSeller" SelectedItem="{Binding Seller}" DisplayMemberBinding="{Binding Name}"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Buyer:"/>
+                <ComboBox x:Name="CmbBuyer" SelectedItem="{Binding Buyer}" DisplayMemberBinding="{Binding Name}"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Id:"/>
+                <TextBox x:Name="TxtId" Text="{Binding Id}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Street:"/>
+                <TextBox x:Name="TxtStreet" Text="{Binding Address.Street}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Zip Code:"/>
+                <TextBox x:Name="TxtZipCode" Text="{Binding Address.ZipCode}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="City:"/>
+                <TextBox x:Name="TxtCity" Text="{Binding Address.City}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Country:"/>
+                <ComboBox x:Name="CmbCountry" SelectedItem="{Binding Address.Country}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Legal Form:"/>
+                <ComboBox x:Name="CmbLegalForm" SelectedItem="{Binding LegalForm}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Area:"/>
+                <TextBox x:Name="TxtArea" Text="{Binding Area}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Column 2: image + category/type specific fields -->
+        <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"  Spacing="8">
+            <StackPanel Spacing="8">
+                <Label Content="Image:"/>
+                <Border Width="300" Height="200"
+                        BorderBrush="LightGray" BorderThickness="1"
+                        CornerRadius="4" ClipToBounds="True">
+                    <Image x:Name="ImgEstate" Stretch="UniformToFill"/>
+                </Border>
+                <Button x:Name="BtnChooseImage"
+                        Content="Choose Image..."
+                        Width="300"
+                        FontSize="16"
+                        Padding="16,8"
+                        HorizontalContentAlignment="Center"
+                        Click="BtnChooseImage_OnClick"/>
+            </StackPanel>
+
+            <!-- Category fields: the template is picked from the category (base class) of the content -->
+            <ContentControl x:Name="DynamicEstateCategory">
+                <ContentControl.DataTemplates>
+                    <!-- Commercial -->
+                    <DataTemplate DataType="estateCategories:Commercial">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Commercial Zoning Code:"/>
+                                <TextBox x:Name="TxtCommercialZoningCode" Text="{Binding CommercialZoningCode}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Number of Parking Spaces:"/>
+                                <TextBox x:Name="TxtNumberOfParkingSpaces" Text="{Binding NumberOfParkingSpaces}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Institutional -->
+                    <DataTemplate DataType="estateCategories:Institutional">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Max Occupancy:"/>
+                                <TextBox x:Name="TxtMaxOccupancy" Text="{Binding MaxOccupancy}"/>
+                            </StackPanel>
+                            <CheckBox x:Name="ChkIsPublicProperty" Content="Is Public Property" IsChecked="{Binding IsPublicProperty}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Residential -->
+                    <DataTemplate DataType="estateCategories:Residential">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Total Number of Rooms:"/>
+                                <TextBox x:Name="TxtTotalNumberOfRooms" Text="{Binding TotalNumberOfRooms}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Number of Bedrooms:"/>
+                                <TextBox x:Name="TxtNumberOfBedrooms" Text="{Binding NumberOfBedrooms}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Number of Bathrooms:"/>
+                                <TextBox x:Name="TxtNumberOfBathrooms" Text="{Binding NumberOfBathrooms}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+
+            <!-- Type fields: the template is picked from the concrete type of the content -->
+            <ContentControl x:Name="DynamicForm">
+                <ContentControl.DataTemplates>
+                    <!-- Residential: Apartment -->
+                    <DataTemplate DataType="estates:Apartment">
+                        <StackPanel Spacing="8">
+                            <CheckBox x:Name="ChkHasBalcony" Content="Has Balcony" IsChecked="{Binding HasBalcony}"/>
+                            <StackPanel>
+                                <Label Content="Floor:"/>
+                                <TextBox x:Name="TxtFloor" Text="{Binding Floor}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Residential: Villa -->
+                    <DataTemplate DataType="estates:Villa">
+                        <StackPanel Spacing="8">
+                            <CheckBox x:Name="ChkVillaHasGarden" Content="Has Garden" IsChecked="{Binding HasGarden}"/>
+                            <StackPanel>
+                                <Label Content="Plot Area (m²):"/>
+                                <TextBox x:Name="TxtPlotArea" Text="{Binding PlotArea}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Residential: Rowhouse -->
+                    <DataTemplate DataType="estates:Rowhouse">
+                        <StackPanel Spacing="8">
+                            <CheckBox x:Name="ChkRowhouseHasGarden" Content="Has Garden" IsChecked="{Binding HasGarden}"/>
+                            <CheckBox x:Name="ChkIsEndUnit" Content="Is End Unit" IsChecked="{Binding IsEndUnit}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Commercial: Hotel -->
+                    <DataTemplate DataType="estates:Hotel">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Rooms:"/>
+                                <TextBox x:Name="TxtNumberOfRooms" Text="{Binding NumberOfRooms}"/>
+                            </StackPanel>
+                            <CheckBox x:Name="ChkHasSwimmingPool" Content="Has Swimming Pool" IsChecked="{Binding HasSwimmingPool}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Commercial: Shop -->
+                    <DataTemplate DataType="estates:Shop">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Display Windows:"/>
+                                <TextBox x:Name="TxtNumberOfDisplayWindows" Text="{Binding NumberOfDisplayWindows}"/>
+                            </StackPanel>
+                            <CheckBox x:Name="ChkIsInShoppingCentre" Content="Is in Shopping Centre" IsChecked="{Binding IsInShoppingCentre}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Commercial: Warehouse -->
+                    <DataTemplate DataType="estates:Warehouse">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Loading Docks:"/>
+                                <TextBox x:Name="TxtNumberOfLoadingDocks" Text="{Binding NumberOfLoadingDocks}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Ceiling Height (m):"/>
+                                <TextBox x:Name="TxtCeilingHeight" Text="{Binding CeilingHeight}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Institutional: Hospital -->
+                    <DataTemplate DataType="estates:Hospital">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Beds:"/>
+                                <TextBox x:Name="TxtNumberOfBeds" Text="{Binding NumberOfBeds}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Number of Operating Rooms:"/>
+                                <TextBox x:Name="TxtNumberOfOperatingRooms" Text="{Binding NumberOfOperatingRooms}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Institutional: School -->
+                    <DataTemplate DataType="estates:School">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Classrooms:"/>
+                                <TextBox x:Name="TxtNumberOfClassrooms" Text="{Binding NumberOfClassrooms}"/>
+                            </StackPanel>
+                            <CheckBox x:Name="ChkHasSportsHall" Content="Has Sports Hall" IsChecked="{Binding HasSportsHall}"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Institutional: University -->
+                    <DataTemplate DataType="estates:University">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Number of Lecture Halls:"/>
+                                <TextBox x:Name="TxtNumberOfLectureHalls" Text="{Binding NumberOfLectureHalls}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="Number of Laboratories:"/>
+                                <TextBox x:Name="TxtNumberOfLaboratories" Text="{Binding NumberOfLaboratories}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="0" Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+            <Label Content="Search by city:" VerticalAlignment="Center"/>
+            <TextBox x:Name="TxtCitySearch" TextChanged="TxtCitySearch_OnTextChanged"/>
+        </StackPanel>
+
+        <ListBox x:Name="LbEstates"
+                 Grid.Row="1" Grid.RowSpan="2" Grid.Column="4"
+                 Classes="items"
+                 SelectionMode="Toggle, Single"
+                 SelectionChanged="LbEstates_OnSelectionChanged"
+                 >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Shown while an item is selected -->
+        <StackPanel x:Name="SpEditButtons"
+                    Grid.Row="2" Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    IsVisible="False">
+            <Button x:Name="BtnEdit" Classes="action" Content="Edit" Click="BtnEdit_OnClick"/>
+            <Button x:Name="BtnRemove" Classes="action" Content="Remove" Click="BtnRemove_OnClick"/>
+        </StackPanel>
+
+        <!-- Shown while nothing is selected -->
+        <Button x:Name="BtnAdd"
+                Grid.Row="2" Grid.Column="0"
+                Classes="action"
+                Content="Add"
+                Click="BtnAdd_OnClick"/>
+    </Grid>
+</UserControl>

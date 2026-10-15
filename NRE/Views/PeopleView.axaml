@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:people="clr-namespace:NRE.Models.Entities.People"
+             x:CompileBindings="False"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="NRE.Views.PeopleView">
+    <Grid RowDefinitions="*,Auto">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="Auto" MinWidth="300"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Column 0: fields shared by all people -->
+        <StackPanel x:Name="SpGeneralForm" Grid.Row="0" Grid.Column="0" Spacing="8" HorizontalAlignment="Left">
+            <StackPanel>
+                <Label Content="Select Person Type:"/>
+                <ComboBox x:Name="CmbPersonType"
+                          DisplayMemberBinding="{Binding DisplayName}"
+                          SelectionChanged="CmbPersonType_OnSelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel>
+                <Label Content="Name:"/>
+                <TextBox x:Name="TxtName" Text="{Binding Name}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Street:"/>
+                <TextBox x:Name="TxtStreet" Text="{Binding Address.Street}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Zip Code:"/>
+                <TextBox x:Name="TxtZipCode" Text="{Binding Address.ZipCode}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="City:"/>
+                <TextBox x:Name="TxtCity" Text="{Binding Address.City}"/>
+            </StackPanel>
+            <StackPanel>
+                <Label Content="Country:"/>
+                <ComboBox x:Name="CmbCountry" SelectedItem="{Binding Address.Country}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Column 2: type specific fields, picked from the type of the content -->
+        <StackPanel Grid.Row="0" Grid.Column="2" Spacing="8">
+            <ContentControl x:Name="DynamicForm">
+                <ContentControl.DataTemplates>
+                    <!-- Seller -->
+                    <DataTemplate DataType="people:Seller">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Rating:"/>
+                                <TextBox x:Name="TxtRating" Text="{Binding Rating}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <!-- Buyer -->
+                    <DataTemplate DataType="people:Buyer">
+                        <StackPanel Spacing="8">
+                            <StackPanel>
+                                <Label Content="Balance:"/>
+                                <TextBox x:Name="TxtBalance" Text="{Binding Balance}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </StackPanel>
+
+        <ListBox x:Name="LbPeople"
+                 Grid.Row="0" Grid.Column="4"
+                 Classes="items"
+                 SelectionChanged="LbPeople_OnSelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Shown while an item is selected -->
+        <StackPanel x:Name="SpEditButtons"
+                    Grid.Row="1" Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    IsVisible="False">
+            <Button x:Name="BtnEdit" Classes="action" Content="Edit" Click="BtnEdit_OnClick"/>
+            <Button x:Name="BtnRemove" Classes="action" Content="Remove" Click="BtnRemove_OnClick"/>
+        </StackPanel>
+
+        <!-- Shown while nothing is selected -->
+        <Button x:Name="BtnAdd"
+                Grid.Row="1" Grid.Column="0"
+                Classes="action"
+                Content="Add"
+                Click="BtnAdd_OnClick"/>
+    </Grid>
+</UserControl>
